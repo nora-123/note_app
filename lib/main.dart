@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
 
 void main() async {
@@ -123,7 +124,11 @@ class SimpleNoteApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.blue),
+      theme: ThemeData(
+        useMaterial3: true,
+        colorSchemeSeed: Colors.indigo,
+        textTheme: GoogleFonts.poppinsTextTheme(),
+      ),
       home: const NotesScreen(),
     );
   }
@@ -191,27 +196,52 @@ class _NotesScreenState extends State<NotesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Simple Notes')),
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        title: Text(
+          'My Notes',
+          style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
       body: _notes.isEmpty
           ? const Center(child: Text('No notes yet'))
           : ListView.builder(
+              padding: const EdgeInsets.all(12),
               itemCount: _notes.length,
-              itemBuilder: (context, i) => ListTile(
-                title: Text(_notes[i].title),
-                subtitle: Text(_notes[i].content),
-                onTap: () => _showForm(_notes[i]),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () async {
-                    await DatabaseHelper.deleteNote(_notes[i].id!);
-                    _refresh();
-                  },
+              itemBuilder: (context, i) => Card(
+                elevation: 2,
+                margin: const EdgeInsets.only(bottom: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  title: Text(
+                    _notes[i].title,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(_notes[i].content),
+                  ),
+                  onTap: () => _showForm(_notes[i]),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                    onPressed: () async {
+                      await DatabaseHelper.deleteNote(_notes[i].id!);
+                      _refresh();
+                    },
+                  ),
                 ),
               ),
             ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showForm(null),
-        child: const Icon(Icons.add),
+        backgroundColor: Colors.indigo,
+        foregroundColor: Colors.white,
+        label: const Text('New Note'),
+        icon: const Icon(Icons.add),
       ),
     );
   }
